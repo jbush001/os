@@ -1,0 +1,78 @@
+#	Defines
+AR = ar
+CC = g++
+LD = ld
+
+OBJ_DIR := OBJECTS
+DEPFLAGS := -MM $(CFLAGS)
+CFLAGS := -nostdinc -W -Wall -Wno-long-long -O2
+LDFLAGS := --script $(BUILDHOME)/lib/glue/jeffos-app.ld
+BIN_DIR := $(BUILDHOME)/bin
+
+define SRCS_LIST_TO_OBJS
+	$(addprefix $(OBJ_DIR)/, $(addsuffix .o, $(foreach file, $(SRCS), $(basename $(notdir $(file))))))
+endef   
+
+define SRCS_LIST_TO_DEPS
+	$(addprefix $(OBJ_DIR)/, $(addsuffix .d, $(foreach file, $(SRCS), $(basename $(notdir $(file))))))
+endef
+
+#	Implicit Rules
+$(OBJ_DIR)/%.o : %.cpp
+	@$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@ 
+	@echo "Compiling $<..."
+	
+$(OBJ_DIR)/%.o : %.c
+	@$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@ 
+	@echo "Compiling $<..."
+
+$(OBJ_DIR)/%.d : %.cpp
+	@$(CC) $(DEPFLAGS) $(INCLUDES) $< > $@
+
+$(OBJ_DIR)/%.d : %.c
+	@$(CC) $(DEPFLAGS) $(INCLUDES) $< > $@
+
+$(OBJ_DIR)/%.d : %.S
+	@echo "Building dependencies for $<..."
+	@$(CC) $(DEPFLAGS) $(INCLUDES) $< > $@
+
+$(OBJ_DIR)/%.d : %.s
+	@echo "Building dependencies for $<..."
+	touch %@
+
+$(OBJ_DIR)/%.o : %.s 
+	@$(CC) -c $< $(CFLAGS) $(INCLUDES) -o $@ 
+	@echo "Assembling $<..."
+
+$(OBJ_DIR)/%.o : %.S 
+	$(CC) -E $< > $(OBJ_DIR)/tmp.s
+	$(CC) $(CFLAGS) $(INCLUDES) -c $(OBJ_DIR)/tmp.s -o $@ 
+	@echo "Assembling $<..."
+
+#	Generic Targets
+all: subdirs $(BINDIR) $(OBJ_DIR) $(TARGET)
+
+$(OBJ_DIR)::
+	@[ -d $(OBJ_DIR) ] || mkdir $(OBJ_DIR) > /dev/null 2>&1
+	
+$(BIN_DIR)::
+	@[ -d $(OBJ_DIR) ] || mkdir $(BIN_DIR) > /dev/null 2>&1
+	
+clean:: 
+	@rm -rf $(OBJ_DIR)
+	@rm -f $(TARGET)
+ifneq ($(SUBDIRS),)
+	@for i in $(SUBDIRS) ; do $(MAKE) -s -C $$i clean; done
+endif
+
+subdirs:: FORCE
+ifneq ($(SUBDIRS),)
+	@for i in $(SUBDIRS) ; do $(MAKE) -s -C $$i; done
+endif
+
+disassemble:
+	objdump --disassemble $(TARGET) > $(basename $(TARGET)).s
+
+FORCE:
+
+include $(SRCS_LIST_TO_DEPS)
