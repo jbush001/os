@@ -1,3 +1,19 @@
+# 
+# Copyright 1998-2012 Jeff Bush
+# 
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+# 
+#     http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+# 
+
 #
 # Context Switch.
 # Note that the current address is implicitly saved/restored
@@ -14,6 +30,8 @@
 # 4. Pop registers off new stack
 # 5. Return to address on new stack, resuming thread
 #
+
+
 
 					.globl ContextSwitch
 					.align 8
@@ -38,10 +56,14 @@ skip_change_cr3:	movl %ebx, %esp				# Switch to the new stack
 					ret
 
 
+
+
+
 #
 # Jump to a specific system call.  This copies parameters from the user stack
 # to the kernel stack before calling the function, then cleans up the stack.
 #
+
 					.globl InvokeSystemCall
 					.align 8
 InvokeSystemCall:	pushl %ebp
@@ -63,6 +85,9 @@ no_params:			call *(%edx)				# Invoke kernel function
 					ret
 
 
+
+
+
 					.global	write_io_str_16
 					.align 8
 write_io_str_16:	pushl %edx
@@ -76,6 +101,8 @@ write_io_str_16:	pushl %edx
 					popl %edx
 					ret
 
+
+
 					.global	read_io_str_16
 					.align 8
 read_io_str_16:		pushl %edx
@@ -88,7 +115,9 @@ read_io_str_16:		pushl %edx
 					popl %edi
 					popl %edx
 					ret
+
 			
+
 					.globl CopyUserInternal
 					.align 8
 CopyUserInternal:	pushl %edi
@@ -109,6 +138,8 @@ on_fault:			movl $0, (%ebx)				# Clear fault handler
 					popl %edi
 					ret
 
+
+
 					.globl SwitchToUserMode
 					.align 8
 SwitchToUserMode:	movl 4(%esp), %eax			# start address
@@ -118,7 +149,7 @@ SwitchToUserMode:	movl 4(%esp), %eax			# start address
 					movw %cx, %es
 					movw %cx, %fs
 					movw %cx, %gs
-						
+
 					# Set up a cross-protection level interrupt frame to jump to
 					# the new thread.
 					pushl $0x23					# User data segment
@@ -128,7 +159,6 @@ SwitchToUserMode:	movl 4(%esp), %eax			# start address
 					pushl %eax 					# EIP
 					iret						# Jump to user space
 
-					
 					.global SetWatchpoint
 					.align 8
 SetWatchpoint:		movl $0x10001, %eax
@@ -136,7 +166,9 @@ SetWatchpoint:		movl $0x10001, %eax
 					movl 4(%esp), %eax
 					movl %eax, %dr0
 					ret
+
 					
+
 					.globl GetDR6
 					.align 8
 GetDR6:				movl %dr6, %eax
