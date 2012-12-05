@@ -1,5 +1,4 @@
-I wrote this as a side project between 1998 and 2000 to learn more about operating systems internals. The kernel
-supports the following features:
+I wrote this as a side project between 1998 and 2000 to learn more about operating systems internals. The kernel supports the following features:
 - Preemptive multi-threading, including a fully preemptable kernel
 - Unified file cache and virtual memory system. File access is performed by memory mapping files into kernel space.  
 - A hardware abstraction layer
