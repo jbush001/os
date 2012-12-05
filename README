@@ -5,5 +5,4 @@ I wrote this as a side project between 1998 and 2000 to learn more about operati
 - Pluggable filesystem layer, including a FAT driver and virtual device filesystem.
 - Modular device driver framework including keyboard, console, and IDE drivers.
 
-When I last worked on this it would boot to a shell that could launch command line executables.  The development environment 
-was BeOS and it used the older GCC ABI, so some bit rot has probably occurred since then.
+When I last worked on this it would boot to a shell that could launch command line executables.  The development environment was BeOS and it used the older GCC ABI, so some bit rot has probably occurred since then.
